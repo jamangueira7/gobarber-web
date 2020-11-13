@@ -5,7 +5,7 @@ import Tooltip from '../Tooltip';
 interface ContainerProps {
   isFocused: boolean;
   isFilled: boolean;
-  isErrored: boolean;
+  isErrored?: boolean;
 }
 
 export const Container = styled.div<ContainerProps>`
@@ -32,8 +32,8 @@ export const Container = styled.div<ContainerProps>`
   `}
 
   ${(props) => props.isFocused && css`
-    color: #ff9000;
     border-color: #ff9000;
+    color: #ff9000;
   `}
 
   input {
@@ -46,7 +46,9 @@ export const Container = styled.div<ContainerProps>`
       color: #666360;
       background: transparent;
     }
-
+    &::autofill {
+      background-color: #232129;
+    }
   }
 
   svg {

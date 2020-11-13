@@ -26,6 +26,8 @@
       "react-hooks/rules-of-hooks": "error",
       "react/prop-types": "off",
       "no-unused-expressions": "off",
+      "no-trailing-spaces": "off",
+      "padded-blocks": "off",
       "react/jsx-props-no-spreading": "off",
       "react-hooks/exhaustive-deps": "warn",
       "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
