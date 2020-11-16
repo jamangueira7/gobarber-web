@@ -21,7 +21,7 @@ interface AuthContextData {
   singIn(credentials: SignInCredentials): Promise<void>;
   singOut(): void;
 }
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+const Auth = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState >(() => {
@@ -58,14 +58,14 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, singIn, singOut }}>
+    <Auth.Provider value={{ user: data.user, singIn, singOut }}>
       {children}
-    </AuthContext.Provider>
+    </Auth.Provider>
   );
 };
 
 export function UserAuth(): AuthContextData {
-  const context = useContext(AuthContext);
+  const context = useContext(Auth);
 
   if (!context) {
     throw new Error('useAuth must be user within an AuthProvider');
