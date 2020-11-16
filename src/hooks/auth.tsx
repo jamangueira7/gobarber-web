@@ -64,7 +64,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   );
 };
 
-export function UserAuth(): AuthContextData {
+export function UseAuth(): AuthContextData {
   const context = useContext(Auth);
 
   if (!context) {
