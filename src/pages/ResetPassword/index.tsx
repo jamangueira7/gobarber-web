@@ -6,13 +6,14 @@ import { FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+
+import api from '../../services/api';
 
 import logoImg from '../../assets/logo.svg';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { UseAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
@@ -24,16 +25,16 @@ import {
 } from './styles';
 
 interface ResetPaswordFormData {
-  email: string;
   password: string;
+  password_confirmation: string;
 }
 
 const ResetPasword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { singIn } = UseAuth();
   const { addToast } = useToast();
   const history = useHistory();
+  const location = useLocation();
 
   const handleSubmit = useCallback(async (data: ResetPaswordFormData) => {
     try {
@@ -51,7 +52,24 @@ const ResetPasword: React.FC = () => {
         abortEarly: false,
       });
 
-      history.push('/signin');
+      const token = location.search.replace('?token=', '');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Erro ao resetar senha',
+          description: 'É necessario ter um token de usuario.',
+        });
+
+        return;
+      }
+
+      await api.post('password/reset', {
+        password: data.password,
+        password_confirmation: data.password_confirmation,
+        token,
+      });
+
+      history.push('/');
 
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -66,7 +84,7 @@ const ResetPasword: React.FC = () => {
         description: 'Ocorreu um erro ao resetar a sua senha, tente novamente.',
       });
     }
-  }, [addToast, history]);
+  }, [addToast, history, location.search]);
   return (
     <Container>
       <Content>
