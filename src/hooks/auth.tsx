@@ -6,6 +6,12 @@ import React, {
 } from 'react';
 import api from '../services/api';
 
+interface User {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
+
 interface SignInCredentials {
   email: string;
   password: string;
@@ -13,11 +19,11 @@ interface SignInCredentials {
 
 interface AuthState {
   token: string;
-  user: object;
+  user: User;
 }
 
 interface AuthContextData {
-  user: object;
+  user: User;
   singIn(credentials: SignInCredentials): Promise<void>;
   singOut(): void;
 }
