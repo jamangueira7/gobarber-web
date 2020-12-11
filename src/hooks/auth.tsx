@@ -4,6 +4,7 @@ import React, {
   useState,
   useContext,
 } from 'react';
+
 import api from '../services/api';
 
 interface User {
@@ -35,6 +36,8 @@ export const AuthProvider: React.FC = ({ children }) => {
     const user = localStorage.getItem('@Gobarber:user');
 
     if (token && user) {
+      api.defaults.headers.authorization = `Bearer ${token}`;
+
       return { token, user: JSON.parse(user) };
     }
 

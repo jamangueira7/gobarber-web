@@ -1,8 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import DayPicker, { DayModifiers } from 'react-day-picker';
+import { FiPower, FiClock } from 'react-icons/fi/index';
 import 'react-day-picker/lib/style.css';
 
-import { FiPower, FiClock } from 'react-icons/fi/index';
+import api from '../../services/api';
+
 import {
   Container,
   Header,
@@ -20,8 +27,15 @@ import logoImg from '../../assets/logo.svg';
 
 import { UseAuth } from '../../hooks/auth';
 
+interface MonthAvailabilityItem {
+  day: number;
+  available: boolean;
+}
+
 const Dashboard: React.FC = () => {
   const [selectDate, setSelectDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [monthAvailability, setMonthAvailability] = useState<MonthAvailabilityItem[]>([]);
 
   const { singOut, user } = UseAuth();
 
@@ -30,6 +44,33 @@ const Dashboard: React.FC = () => {
       setSelectDate(day);
     }
   }, []);
+
+  const handleMonthChange = useCallback((month: Date) => {
+    setCurrentMonth(month);
+  }, []);
+
+  useEffect(() => {
+    api.get(`/providers/${user.id}/month-availability`, {
+      params: {
+        year: currentMonth.getFullYear(),
+        month: currentMonth.getMonth() + 1,
+      },
+    }).then((response) => {
+      setMonthAvailability(response.data);
+    });
+  }, [currentMonth, user.id]);
+
+  const disableDays = useMemo(() => {
+    const dates = monthAvailability
+      .filter((monthDay) => monthDay.available === false)
+      .map((monthDay) => {
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        return new Date(year, month, monthDay.day);
+      });
+
+    return dates;
+  }, [currentMonth, monthAvailability]);
 
   return (
     <Container>
@@ -107,8 +148,10 @@ const Dashboard: React.FC = () => {
             }}
             disabledDays={[
               { daysOfWeek: [0, 6] },
+              ...disableDays,
             ]}
             onDayClick={handleDateChange}
+            onMonthChange={handleMonthChange}
             selectedDays={selectDate}
             months={[
               'Janeiro',
