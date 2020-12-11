@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FiPower, FiClock } from 'react-icons/fi/index';
 import {
   Container,
@@ -8,6 +8,8 @@ import {
   Content,
   Schedule,
   NextAppointment,
+  Section,
+  Appointment,
   Calendar,
 } from './styles';
 
@@ -16,6 +18,8 @@ import logoImg from '../../assets/logo.svg';
 import { UseAuth } from '../../hooks/auth';
 
 const Dashboard: React.FC = () => {
+  const [selectDate, setSelectDate] = useState(new Date());
+
   const { singOut, user } = UseAuth();
 
   return (
@@ -54,6 +58,36 @@ const Dashboard: React.FC = () => {
               </span>
             </div>
           </NextAppointment>
+          <Section>
+            <strong>Manhã</strong>
+            <Appointment>
+              <FiClock />
+              08:00
+              <div>
+                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
+                <strong>Diego fernandes</strong>
+              </div>
+            </Appointment>
+            <Appointment>
+              <FiClock />
+              08:00
+              <div>
+                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
+                <strong>Diego fernandes</strong>
+              </div>
+            </Appointment>
+          </Section>
+          <Section>
+            <strong>Tarde</strong>
+            <Appointment>
+              <FiClock />
+              08:00
+              <div>
+                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
+                <strong>Diego fernandes</strong>
+              </div>
+            </Appointment>
+          </Section>
         </Schedule>
         <Calendar />
       </Content>
