@@ -11,7 +11,7 @@ const { v4: uuid } = require('uuid');
 
 export interface ToastMessage {
   id: string;
-  type: 'success' | 'error' | 'info';
+  type?: 'success' | 'error' | 'info';
   title: string;
   description?: string;
 }
@@ -24,7 +24,7 @@ interface ToastContextData {
 const ToastContext = createContext<ToastContextData>({} as ToastContextData);
 
 const ToastProvider: React.FC = ({ children }) => {
-  const [messages, setMessagens] = useState<ToastMessage[]>([]);
+  const [messages, setMessages] = useState<ToastMessage[]>([]);
 
   const addToast = useCallback(({ type, title, description }: Omit<ToastMessage, 'id'>) => {
 
@@ -36,11 +36,12 @@ const ToastProvider: React.FC = ({ children }) => {
       title,
       description,
     };
-    setMessagens((state) => [...state, toast]);
+
+    setMessages((state) => [...state, toast]);
   }, []);
 
   const removeToast = useCallback((id: string) => {
-    setMessagens((state) => state.filter((message) => message.id !== id));
+    setMessages((state) => state.filter((message) => message.id !== id));
   }, []);
 
   return (
