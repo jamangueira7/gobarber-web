@@ -5,7 +5,7 @@ import React, {
   useState,
 } from 'react';
 
-import { isToday, format } from 'date-fns';
+import { isToday, format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import DayPicker, { DayModifiers } from 'react-day-picker';
@@ -35,6 +35,7 @@ import { UseAuth } from '../../hooks/auth';
 interface Appointments {
   id: string;
   date: string;
+  hourFormatted: string;
   user: {
     name: string;
     avatar_url: string;
@@ -76,15 +77,20 @@ const Dashboard: React.FC = () => {
   }, [currentMonth, user.id]);
 
   useEffect(() => {
-    api.get('/appointments/me', {
+    api.get<Appointments[]>('/appointments/me', {
       params: {
         year: selectDate.getFullYear(),
         month: selectDate.getMonth() + 1,
         day: selectDate.getDate(),
       },
     }).then((response) => {
-      setAppointments(response.data);
-      console.log(response.data);
+      const appointmentsFormatted = response.data.map((appointment) => {
+        return {
+          ...appointment,
+          hourFormatted: format(parseISO(appointment.date), 'HH:mm'),
+        };
+      });
+      setAppointments(appointmentsFormatted);
 
     });
   }, [selectDate]);
@@ -112,6 +118,18 @@ const Dashboard: React.FC = () => {
       locale: ptBR,
     });
   }, [selectDate]);
+
+  const morningAppointments = useMemo(() => {
+    return appointments.filter((appointment) => {
+      return parseISO(appointment.date).getHours() < 12;
+    });
+  }, [appointments]);
+
+  const afternoonAppointments = useMemo(() => {
+    return appointments.filter((appointment) => {
+      return parseISO(appointment.date).getHours() >= 12;
+    });
+  }, [appointments]);
 
   return (
     <Container>
@@ -151,33 +169,29 @@ const Dashboard: React.FC = () => {
           </NextAppointment>
           <Section>
             <strong>Manhã</strong>
-            <Appointment>
-              <FiClock />
-              08:00
-              <div>
-                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
-                <strong>Diego fernandes</strong>
-              </div>
-            </Appointment>
-            <Appointment>
-              <FiClock />
-              08:00
-              <div>
-                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
-                <strong>Diego fernandes</strong>
-              </div>
-            </Appointment>
+            {morningAppointments.map((appointment) => (
+              <Appointment key={appointment.id}>
+                <FiClock />
+                {appointment.hourFormatted}
+                <div>
+                  <img src={appointment.user.avatar_url} alt={appointment.user.name} />
+                  <strong>{appointment.user.name}</strong>
+                </div>
+              </Appointment>
+            ))}
           </Section>
           <Section>
             <strong>Tarde</strong>
-            <Appointment>
-              <FiClock />
-              08:00
-              <div>
-                <img src="https://avatars1.githubusercontent.com/u/1902749?s=460&u=382acdf7478c6499d9b4321e68523d17b699e802&v=4" alt="Diego fernandes" />
-                <strong>Diego fernandes</strong>
-              </div>
-            </Appointment>
+            {afternoonAppointments.map((appointment) => (
+              <Appointment key={appointment.id}>
+                <FiClock />
+                {appointment.hourFormatted}
+                <div>
+                  <img src={appointment.user.avatar_url} alt={appointment.user.name} />
+                  <strong>{appointment.user.name}</strong>
+                </div>
+              </Appointment>
+            ))}
           </Section>
         </Schedule>
         <Calendar>
